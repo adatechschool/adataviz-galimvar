@@ -1,19 +1,23 @@
 /* const apiJSON = "https://data.loire-atlantique.fr/api/explore/v2.1/catalog/datasets/793866443_fetes-et-manifestations-en-loire-atlantique/records?limit=-1"; */
 
-import { constructionURLIFrame, extraireCategorie, filtreCategorie } from "./utils.js";
+import { constructionURLIFrame, extraireCategorie, filtreCategorie, formaterDate, obtenirIcone, searchFunct } from "./utils.js";
 
 
 //export qui permet de supprimer la limite de 100 éléments -> du coup ma carte affiche le bon nombre d'éléments par rapport à mes cartes, sans ça j'avais trois éléments ciné, mais beaucoup plus sur la carte, c'est perturbant.
 const apiJSON = "https://data.loire-atlantique.fr/api/explore/v2.1/catalog/datasets/793866443_fetes-et-manifestations-en-loire-atlantique/exports/json";
 
+let mesDonnees;
+
+
 const sectionCartes = document.getElementById("sectionCartes");
 const navBarre = document.getElementById("navBarre");
 const map = document.getElementById("map");
 const menu = document.getElementById("spanMenu");
+const inputSearch = document.getElementById("inputSearch");
 
 const createMenu = (categoriesUniques, mesDonnees) => {
     let i = 0;
-    navBarre.innerHTML=`<p class="buttonCategorie" id="all">Afficher tous les évènements</p>`;
+    navBarre.innerHTML=`<p class="buttonCategorie boutonTous" id="all"><span class="icone">🗺️</span><span class="nom">Tous les évènements</span></p>`;
     document.getElementById("all").onclick = () => {
                 navBarre.classList.add("cache")
                 afficherMap("9,47.29786,-1.69739", "codepostal")
@@ -21,7 +25,7 @@ const createMenu = (categoriesUniques, mesDonnees) => {
             }
     categoriesUniques.forEach((categorie) => {
         if(categorie != null){
-            const liste = `<p class="buttonCategorie" id="${i}">${categorie}</p>`;
+            const liste = `<p class="buttonCategorie" id="${i}"><span class="icone">${obtenirIcone(categorie)}</span><span class="nom">${categorie}</span></p>`;
             navBarre.insertAdjacentHTML("beforeend", liste)
             document.getElementById(i).onclick = () => {
                 navBarre.classList.add("cache")
@@ -45,9 +49,9 @@ const createCard = (mesDonnees, categorie) => {
 
     donneesAAfficher.forEach(event => {
         const card =   `<article class="card" id="card_${i}">
-                            <p class="categorie"> ${event.categorie}</p>
+                            <p class="categorie"> ${obtenirIcone(event.categorie)}</p>
                             <h3 class="titreEvent"> ${event.nomoffre} </h3>
-                            <p class="lieu">${event.codepostal} ${event.commune}</p>
+                            <p class="lieu">${event.codepostal} ${event.commune}</p><p>${formaterDate(event.ouverturegranule)}</p>
                         </article>`;
         sectionCartes.insertAdjacentHTML("beforeend", card);
         document.getElementById(`card_${i}`).onclick = () => {
@@ -83,7 +87,7 @@ const fetchData = async () => {
     // Récupérer les données de l'API -> fetch
     const response = await fetch(apiJSON)
     // Transformer en json -> .json()
-    const mesDonnees  = await response.json()
+    mesDonnees  = await response.json()
     //console.log(mesDonnees)
     
     
@@ -109,3 +113,8 @@ menu.addEventListener("click", () => {
     navBarre.classList.toggle("cache");
 })
 
+inputSearch.addEventListener("input", () => {
+    const maRecherche = searchFunct(mesDonnees, inputSearch.value);
+    createCard(maRecherche);
+
+})
