@@ -1,6 +1,6 @@
 /* const apiJSON = "https://data.loire-atlantique.fr/api/explore/v2.1/catalog/datasets/793866443_fetes-et-manifestations-en-loire-atlantique/records?limit=-1"; */
 
-import { constructionURLIFrame, extraireCategorie, filtreCategorie, formaterDate, obtenirIcone, searchFunct } from "./utils.js";
+import { constructionURLIFrame, extraireCategorie, filtreCategorie, formaterDate, obtenirIcone, searchFunct, trierParDate, trierParNom } from "./utils.js";
 
 
 //export qui permet de supprimer la limite de 100 éléments -> du coup ma carte affiche le bon nombre d'éléments par rapport à mes cartes, sans ça j'avais trois éléments ciné, mais beaucoup plus sur la carte, c'est perturbant.
@@ -8,12 +8,20 @@ const apiJSON = "https://data.loire-atlantique.fr/api/explore/v2.1/catalog/datas
 
 let mesDonnees;
 
+let etatFiltres = {
+    categorie: undefined,
+/*     dateDebut: undefined,
+    dateFin: undefined, */
+    tri: "date"
+};
+
 
 const sectionCartes = document.getElementById("sectionCartes");
 const navBarre = document.getElementById("navBarre");
 const map = document.getElementById("map");
 const menu = document.getElementById("spanMenu");
 const inputSearch = document.getElementById("inputSearch");
+const monTri = document.getElementById("monTri");
 
 const createMenu = (categoriesUniques, mesDonnees) => {
     let i = 0;
@@ -28,9 +36,10 @@ const createMenu = (categoriesUniques, mesDonnees) => {
             const liste = `<p class="buttonCategorie" id="${i}"><span class="icone">${obtenirIcone(categorie)}</span><span class="nom">${categorie}</span></p>`;
             navBarre.insertAdjacentHTML("beforeend", liste)
             document.getElementById(i).onclick = () => {
+                etatFiltres.categorie = categorie;
                 navBarre.classList.add("cache")
                 afficherMap("9,47.29786,-1.69739", "codepostal", categorie)
-                createCard(mesDonnees, categorie);
+                rafraichirPage(etatFiltres);
             }
             i++;
         }
@@ -69,6 +78,23 @@ const afficherMap = (coordonates, tri, categorie) => {
     map.insertAdjacentHTML("beforeend", constructionURLIFrame(coordonates, tri, categorie));
 }
 
+const rafraichirPage = (filtre) => {
+    let donneesFiltrees = [...mesDonnees];
+    if(etatFiltres.categorie != undefined){
+        donneesFiltrees =  filtreCategorie(mesDonnees, etatFiltres.categorie);
+    } 
+    
+
+    if(etatFiltres.tri == "Nom"){
+        donneesFiltrees = trierParNom(donneesFiltrees);
+    } else if(etatFiltres.tri == "Date"){
+        donneesFiltrees = trierParDate(donneesFiltrees);
+    }
+
+    createCard(donneesFiltrees);
+}
+
+
 const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) =>{
             if(entry.isIntersecting){
@@ -98,7 +124,7 @@ const fetchData = async () => {
     createMenu(extraireCategorie(mesDonnees), mesDonnees);
     
     //création des cartes        
-    createCard(mesDonnees)
+    createCard(trierParDate(mesDonnees))
 
     //affichage dynamique de la carte
     afficherMap("9,47.29786,-1.69739", "codepostal");
@@ -117,4 +143,11 @@ inputSearch.addEventListener("input", () => {
     const maRecherche = searchFunct(mesDonnees, inputSearch.value);
     createCard(maRecherche);
 
+})
+
+monTri.addEventListener("change", () => {
+    etatFiltres.tri = monTri.value;
+    console.log(monTri.value)
+    rafraichirPage(etatFiltres);
+    
 })

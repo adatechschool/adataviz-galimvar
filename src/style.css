@@ -59,6 +59,11 @@ h1 {
     letter-spacing: 0.5px;
 }
 
+label {
+    font-family: var(--font-corps);
+    color: var(--sable);
+}
+
 .blocRechercheMenu {
     display: flex;
     flex-direction: row;

@@ -1,3 +1,32 @@
+export const parseDate = (dateNonParse) =>{
+    const tabDate = dateNonParse.split('/');
+
+    const dateValide = `${tabDate[1]}/${tabDate[0]}/${tabDate[2]}`;
+
+    return new Date(dateValide);
+}
+
+
+export  const obtenirPremiereDate = (dateNonParse) => {
+    let tabDate = dateNonParse.split(",");
+    tabDate = tabDate[0].split("||");
+
+    return parseDate(tabDate[0]);
+}
+
+
+export const trierParDate = (mesDonnees) => {
+    const maCopieDonnees = [...mesDonnees];
+    return maCopieDonnees.sort((a , b) => obtenirPremiereDate(a.ouverturegranule) - obtenirPremiereDate(b.ouverturegranule));
+    
+}
+
+export const trierParNom = (mesDonnees) => {
+    const maCopieDonnees = [...mesDonnees];
+    return maCopieDonnees.sort((a , b) => a.nomoffre.localeCompare(b.nomoffre, "fr", { ignorePunctuation: true }));
+}
+
+
 export const searchFunct = (data, string) => {
     if (string.trim() === "") {
         return data;
@@ -32,12 +61,14 @@ export const formaterDate = (dates) =>{
             monRetour += `Du ${maDate[0]} au ${maDate[1]} `;
         }
 
-        if(maDate[3] == "" || maDate[3] == undefined){
+        if(maDate[2] == "" || maDate[2] == undefined){
             monRetour += "";
         }
-        else if(maDate[2] == maDate[3] && maDate[2] != ""){
+        else if(maDate[2] == maDate[3]){
             monRetour += `à ${maDate[2]} `;
-        }else{
+        }else if(maDate[3] == ""){
+            monRetour += `dès ${maDate[2]} `;
+        }else {
             monRetour += `de ${maDate[2]} à ${maDate[3]}`;
         }
         monRetour += "</span><br>";
