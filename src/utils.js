@@ -16,8 +16,8 @@ export const parseDate = (dateNonParse) =>{
  * Retourne une date au format FR 
  * 
  * 
- * @param {String} dateNonParse //format ||10/12/2026||12/12/2026||9:00||12:00||,||14/10/2026||||||||
- * @returns {String} //format 10/12/2026
+ * @param {String} dateNonParse //format 10/07/2026||10/07/2026||20:00||20:00||||,11/07/2026||11/07/2026||20:00||20:00||||,12/07/2026||12/07/2026||18:00||18:00||||
+ * @returns {String} //format 10/07/2026
  */
 export  const obtenirPremiereDate = (dateNonParse) => {
     let tabDate = dateNonParse.split(",");
@@ -81,7 +81,7 @@ export const searchFunct = (data, string) => {
 /**
  * Retourne une chaine de caractères pour une insertion HTML, à partir d'une chaine de dates non-formatée 
  * 
- * @param {String} dates //format ||10/12/2026||12/12/2026||9:00||12:00||,||14/10/2026||||||||
+ * @param {String} dates //format 10/07/2026||10/07/2026||20:00||20:00||||,11/07/2026||11/07/2026||20:00||20:00||||,12/07/2026||12/07/2026||18:00||18:00||||
  * @returns {String}
  */
 export const formaterDate = (dates) =>{
