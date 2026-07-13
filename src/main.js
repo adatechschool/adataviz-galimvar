@@ -8,10 +8,12 @@ const apiJSON = "https://data.loire-atlantique.fr/api/explore/v2.1/catalog/datas
 
 let mesDonnees;
 
+
+//objet permettant de sauvegarder les différents filtres de l'utilisateur
 let etatFiltres = {
     categorie: undefined,
-/*     dateDebut: undefined,
-    dateFin: undefined, */
+    dateDebut: undefined,
+    dateFin: undefined,
     tri: "date"
 };
 
@@ -23,6 +25,13 @@ const menu = document.getElementById("spanMenu");
 const inputSearch = document.getElementById("inputSearch");
 const monTri = document.getElementById("monTri");
 
+
+
+/**
+ * Affiche un menu, en fonction des catégories de l'API, et l'insère en HTML
+ * @param {Array[Object]} categoriesUniques 
+ * @param {Array[Object]} mesDonnees 
+ */
 const createMenu = (categoriesUniques, mesDonnees) => {
     let i = 0;
     navBarre.innerHTML=`<p class="buttonCategorie boutonTous" id="all"><span class="icone">🗺️</span><span class="nom">Tous les évènements</span></p>`;
@@ -47,6 +56,14 @@ const createMenu = (categoriesUniques, mesDonnees) => {
     })
 }
 
+
+/**
+ * Créé et affiche les cartes correspondantes en fonction de la catégorie depuis les données de l'API
+ * 
+ * 
+ * @param {Array[Object]} mesDonnees 
+ * @param {String} categorie 
+ */
 const createCard = (mesDonnees, categorie) => {
     let i = 0;
     sectionCartes.innerHTML = "";
@@ -73,11 +90,25 @@ const createCard = (mesDonnees, categorie) => {
     allCategorie.forEach((el) => observer.observe(el))
 }
 
+
+/**
+ * Affiche dynamiquement la map iframe
+ * 
+ * @param {String} coordonates 
+ * @param {String} tri 
+ * @param {String} categorie 
+ */
 const afficherMap = (coordonates, tri, categorie) => {
     map.innerHTML="";
     map.insertAdjacentHTML("beforeend", constructionURLIFrame(coordonates, tri, categorie));
 }
 
+
+/**
+ * Renvoie les données correspondantes aux filtres
+ * 
+ * @param {Object} filtre 
+ */
 const rafraichirPage = (filtre) => {
     let donneesFiltrees = [...mesDonnees];
     if(etatFiltres.categorie != undefined){
@@ -94,7 +125,7 @@ const rafraichirPage = (filtre) => {
     createCard(donneesFiltrees);
 }
 
-
+//Ajoute ou remove la classe quand un élément entre dans l'écran
 const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) =>{
             if(entry.isIntersecting){
@@ -107,7 +138,7 @@ const observer = new IntersectionObserver((entries) => {
     }, {})
 
 
-
+//récupération données de l'API, appelle les fonctions générant la page
 const fetchData = async () => {
   try {
     // Récupérer les données de l'API -> fetch

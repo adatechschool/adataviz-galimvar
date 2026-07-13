@@ -1,3 +1,9 @@
+/**
+ * Retourne une date au format américain, pour utilisation des fonctions de dates de JS
+ * 
+ * @param {String} dateNonParse //format 25/12/2026 
+ * @returns {Date} //format 12/25/2026
+ */
 export const parseDate = (dateNonParse) =>{
     const tabDate = dateNonParse.split('/');
 
@@ -6,7 +12,13 @@ export const parseDate = (dateNonParse) =>{
     return new Date(dateValide);
 }
 
-
+/**
+ * Retourne une date au format FR 
+ * 
+ * 
+ * @param {String} dateNonParse //format ||10/12/2026||12/12/2026||9:00||12:00||,||14/10/2026||||||||
+ * @returns {String} //format 10/12/2026
+ */
 export  const obtenirPremiereDate = (dateNonParse) => {
     let tabDate = dateNonParse.split(",");
     tabDate = tabDate[0].split("||");
@@ -14,19 +26,39 @@ export  const obtenirPremiereDate = (dateNonParse) => {
     return parseDate(tabDate[0]);
 }
 
-
+/**
+ * Retourne un tableau d'objet, trié par date
+ * 
+ * 
+ * @param {Array[Object]} mesDonnees 
+ * @returns {Array[Object]}
+ */
 export const trierParDate = (mesDonnees) => {
     const maCopieDonnees = [...mesDonnees];
     return maCopieDonnees.sort((a , b) => obtenirPremiereDate(a.ouverturegranule) - obtenirPremiereDate(b.ouverturegranule));
     
 }
 
+/**
+ * Retourn un tableau d'objet, trié par nom
+ * 
+ * 
+ * @param {Array[Object]} mesDonnees 
+ * @returns {Array[Object]}
+ */
 export const trierParNom = (mesDonnees) => {
     const maCopieDonnees = [...mesDonnees];
     return maCopieDonnees.sort((a , b) => a.nomoffre.localeCompare(b.nomoffre, "fr", { ignorePunctuation: true }));
 }
 
-
+/**
+ * Retourne un tableau d'objet, dont les noms contiennent la chaine passsée en paramètres
+ * 
+ * 
+ * @param {Array[Object]} data 
+ * @param {String} string 
+ * @returns {Array[Object]}
+ */
 export const searchFunct = (data, string) => {
     if (string.trim() === "") {
         return data;
@@ -45,6 +77,13 @@ export const searchFunct = (data, string) => {
     return maRecherche;
 };
 
+
+/**
+ * Retourne une chaine de caractères pour une insertion HTML, à partir d'une chaine de dates non-formatée 
+ * 
+ * @param {String} dates //format ||10/12/2026||12/12/2026||9:00||12:00||,||14/10/2026||||||||
+ * @returns {String}
+ */
 export const formaterDate = (dates) =>{
     let monRetour = "<details class='heure'><summary>Voir dates et heures</summary>";
 
@@ -80,10 +119,25 @@ export const formaterDate = (dates) =>{
     return monRetour;
 }
 
+
+/**
+ * Reçoit une chaine de caractères avec accent, et la retourne sans accents (aidée de l'IA)
+ * 
+ * 
+ * @param {String} texte 
+ * @returns {String}
+ */
 export const retirerAccents = (texte) => {
    return texte.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
+
+/**
+ * Retourne un tableau contenant les différentes catégories, sans doublons
+ * 
+ * @param {Array[Object]} mesDonnees 
+ * @returns {Array[Object]}
+ */
 export const extraireCategorie = (mesDonnees) => {
     const mesCategories = new Set(mesDonnees.map(item => item.categorie))
 
@@ -91,11 +145,28 @@ export const extraireCategorie = (mesDonnees) => {
 
 }
 
+/**
+ * Filtre un tableau de données et retourne celles contenant uniquement la bonne catégorie
+ * 
+ * @param {Array[Object]} mesDonnees 
+ * @param {String} categorie 
+ * @returns 
+ */
 export const filtreCategorie = (mesDonnees, categorie) => {
     return mesDonnees.filter((filtre) => filtre.categorie === categorie);
     
 }
 
+
+/**
+ * Retourne un iframme injectable en HTML pour affichage d'une map grâce aux coordonnées, la catégorie, et un tri
+ * 
+ * 
+ * @param {String} coordonates 
+ * @param {String} tri 
+ * @param {String} categorie 
+ * @returns 
+ */
 export const constructionURLIFrame = (coordonates, tri, categorie) => {
     let parametre = "";
     if(categorie != undefined){
@@ -105,7 +176,7 @@ export const constructionURLIFrame = (coordonates, tri, categorie) => {
     return `<iframe src="https://data.loire-atlantique.fr/explore/embed/dataset/793866443_fetes-et-manifestations-en-loire-atlantique/map/?disjunctive.commune&sort=${tri}&location=${coordonates}&${parametre}basemap=jawg.streets&static=false&datasetcard=false&scrollWheelZoom=true" frameborder="0"></iframe>`
 }
 
-
+//objet
 const iconesCategories = {
   "Stages-Atelier-Jeux": "🛠️",
   "Concert": "🎵",
@@ -132,4 +203,10 @@ const iconesCategories = {
   "Cirque": "🤹"
 };
 
+/**
+ * Reçoit une chaine de caractère et renvoie l'icône correspondant
+ * 
+ * @param {String} categorie 
+ * @returns 
+ */
 export const obtenirIcone = (categorie) => iconesCategories[categorie] ?? "📍";
